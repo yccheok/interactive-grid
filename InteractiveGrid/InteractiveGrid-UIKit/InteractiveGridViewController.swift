@@ -24,7 +24,7 @@ import SwiftUI
 ///
 /// The end result is a collection view that works about 95% percent of the time as expected by just using the combination
 /// of stock UIKit API.
-final class InteractiveGridViewController: UIViewController {
+final class InteractiveGridViewController: UICollectionViewController {
 
     /// Mutable collection of `Model`s.
     var models: [Model] {
@@ -46,7 +46,6 @@ final class InteractiveGridViewController: UIViewController {
     }
 
     private lazy var dataSource = lazyDataSource()
-    private lazy var collectionView = lazyCollectionView()
 
     private lazy var layoutGroupProvider = lazyDynamicLayoutGroupProvider()
 
@@ -62,10 +61,9 @@ extension InteractiveGridViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         enableReorderSupport(on: dataSource)
 
-        add(collectionView, to: view)
         configure(collectionView)
     }
 }
@@ -95,7 +93,7 @@ extension InteractiveGridViewController: UICollectionViewDragDelegate {
         return []
     }
 
-    func collectionView(
+    override func collectionView(
         _: UICollectionView,
         targetIndexPathForMoveOfItemFromOriginalIndexPath originalIndexPath: IndexPath,
         atCurrentIndexPath currentIndexPath: IndexPath,
@@ -166,9 +164,9 @@ extension InteractiveGridViewController: UICollectionViewDropDelegate {
 
 // MARK: UICollectionViewDelegate - Menu Support
 
-extension InteractiveGridViewController: UICollectionViewDelegate {
+extension InteractiveGridViewController {
 
-    func collectionView(
+    override func collectionView(
         _: UICollectionView,
         contextMenuConfigurationForItemAt indexPath: IndexPath,
         point _: CGPoint
@@ -215,7 +213,7 @@ extension InteractiveGridViewController: UICollectionViewDelegate {
         )
     }
 
-    func collectionView(
+    override func collectionView(
         _ collectionView: UICollectionView,
         previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration
     ) -> UITargetedPreview? {
@@ -223,7 +221,7 @@ extension InteractiveGridViewController: UICollectionViewDelegate {
         return makeTargetedPreview(withConfiguration: configuration, collectionView: collectionView)
     }
 
-    func collectionView(
+    override func collectionView(
         _ collectionView: UICollectionView,
         previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration
     ) -> UITargetedPreview? {
@@ -469,26 +467,9 @@ extension InteractiveGridViewController {
 // MARK: UICollectionView Set Up
 
 extension InteractiveGridViewController {
-
-    private func lazyCollectionView() -> UICollectionView {
-        return UICollectionView(frame: .zero, collectionViewLayout: makeDynamicCollectionViewLayout())
-    }
-
-    private func add(_ collectionView: UICollectionView, to view: UIView) {
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .clear
-
-        view.addSubview(collectionView)
-
-        NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.topAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
-        ])
-    }
-
     private func configure(_ collectionView: UICollectionView) {
+        collectionView.collectionViewLayout = makeDynamicCollectionViewLayout()
+        
         collectionView.backgroundColor = .clear
 
         collectionView.delegate = self
